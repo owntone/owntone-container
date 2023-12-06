@@ -225,4 +225,4 @@ Currently, this containerisation supports the x86-64 architecture.
 
 ## Contribution
 
-If you want to contribute to make this containerisation better, please open a work item here.
+If you want to contribute to make this containerisation better, please open a work item [here](https://github.com/owntone/owntone-container/issues).
