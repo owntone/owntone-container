@@ -1,0 +1,29 @@
+#!/sbin/openrc-run
+
+name="${RC_SVCNAME}"
+description="OwnTone"
+
+pidfile="/run/${RC_SVCNAME}.pid"
+configfile="/etc/${RC_SVCNAME}/${RC_SVCNAME}.conf"
+
+command="/usr/sbin/owntone"
+command_args="-P ${pidfile}"
+
+checkconfig() {
+  adduser -D -g ${RC_SVCNAME} -h /dev/null -s /sbin/nologin ${RC_SVCNAME} &>/dev/null
+  usermod -u ${UID-$(id -u ${RC_SVCNAME})} ${RC_SVCNAME} &>/dev/null
+  groupmod -g ${GID-$(id -g ${RC_SVCNAME})} ${RC_SVCNAME} &>/dev/null
+  if [ ! -f "${configfile}" ]; then
+    install -D -o ${RC_SVCNAME} -g ${RC_SVCNAME} -m 755 "/usr/share/doc/${RC_SVCNAME}/examples/${RC_SVCNAME}.conf" "${configfile}"
+  fi
+}
+
+depend() {
+  need avahi-dnsconfd
+}
+
+start_pre() {
+  if [ "${RC_CMD}" != "restart" ] ; then
+    checkconfig || return $?
+  fi
+}
