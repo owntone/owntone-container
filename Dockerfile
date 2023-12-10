@@ -1,6 +1,6 @@
-ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/latest-stable/community
+ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.18
 
-FROM alpine:latest AS build
+FROM alpine:3.18 AS build
 
 ARG PACKAGE_REPOSITORY_URL
 ARG REPOSITORY_URL=https://github.com/owntone/owntone-server.git
@@ -41,9 +41,9 @@ RUN \
     npm \
     protobuf-c-dev \
     sqlite-dev && \
-  git clone -q -b ${REPOSITORY_BRANCH} ${REPOSITORY_URL} ./ && \
-  if [ ${REPOSITORY_COMMIT} ]; then git checkout -q ${REPOSITORY_COMMIT}; \
-  elif [ ${REPOSITORY_TAG} ]; then git checkout -q tags/${REPOSITORY_TAG}; fi && \
+  git clone -b ${REPOSITORY_BRANCH} ${REPOSITORY_URL} ./ && \
+  if [ ${COMMIT} ]; then git checkout ${COMMIT}; \
+  elif [ ${TAG} ]; then git checkout tags/${TAG}; fi && \
   cd web-src && \
   npm update -s --no-progress && \
   npm run -s build -- -l silent && \
@@ -65,7 +65,7 @@ RUN \
   install -D etc/owntone/owntone.conf usr/share/doc/owntone/examples/owntone.conf && \
   rm -rf var etc
 
-FROM alpine:latest AS runtime
+FROM alpine:3.18 AS runtime
 
 ARG PACKAGE_REPOSITORY_URL
 
@@ -108,10 +108,7 @@ RUN \
     -e 's/#rc_sys=".*"/rc_sys="docker"/g' \
     /etc/rc.conf && \
   rc-update add syslog boot && \
-  rc-update add dbus boot && \
-  rc-update add avahi-daemon boot default && \
-  rc-update add avahi-dnsconfd boot default && \
-  rc-update add owntone default && \
+  rc-update add owntone boot && \
   install -D /dev/null /run/openrc/softlevel
 
 ENTRYPOINT ["/sbin/init"]
