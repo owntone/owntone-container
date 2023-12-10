@@ -109,8 +109,8 @@ RUN \
     /etc/rc.conf && \
   rc-update add syslog boot && \
   rc-update add dbus boot && \
-  rc-update add avahi-daemon default && \
-  rc-update add avahi-dnsconfd default && \
+  rc-update add avahi-daemon boot default && \
+  rc-update add avahi-dnsconfd boot default && \
   rc-update add owntone default && \
   install -D /dev/null /run/openrc/softlevel
 
