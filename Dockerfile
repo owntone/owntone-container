@@ -80,6 +80,7 @@ RUN \
     curl \
     dbus \
     ffmpeg \
+    gnutls \
     json-c \
     libevent \
     libgcrypt \
