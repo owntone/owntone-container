@@ -117,7 +117,7 @@ docker run -d \
   -v <log-location>:/var/log/owntone \
   -v <database-location>:/var/cache/owntone \
   --restart unless-stopped \
-  owntone/owntone-server:<tag>
+  owntone/owntone:<tag>
 ```
 
 Where
@@ -143,7 +143,7 @@ docker run -d \
   -v /var/log/owntone:/var/log/owntone \
   -v /var/cache/owntone:/var/cache/owntone \
   --restart unless-stopped \
-  owntone/owntone-server:latest
+  owntone/owntone:latest
 ```
 
 ### Compose Command
@@ -160,7 +160,7 @@ Hereunder, you have an example of a Compose file (`owntone.yaml`).
 version: "3.8"
 services:
   owntone:
-    image: owntone/owntone-server:latest
+    image: owntone/owntone:latest
     container_name: OwnTone
     network_mode: host
     environment:
