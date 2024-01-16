@@ -2,7 +2,29 @@
 
 The OwnTone container offers a hassle-free solution for deploying the OwnTone media server. By encapsulating OwnTone and its dependencies in a container, users enjoy consistent deployment across various platforms.
 
-This approach enhances reliability, simplifies version control, and allows users to focus on utilizing OwnTone's media server features rather than dealing with complicated installation processes.
+This approach enhances reliability, simplifies version control, and allows users to focus on using OwnTone’s media server features rather than dealing with complicated installation processes.
+
+## Quick Start
+
+If you can’t wait to run OwnTone, here is a quick start procedure. It implies that you already have a running [Docker](https://www.docker.com) or [Podman](https://podman.io) installation.
+
+```bash
+# Create the minimal structure
+mkdir -p $HOME/OwnTone/{etc,media,cache,log}
+
+# Launch the container
+docker run -d \
+  --name=OwnTone \
+  --network=host \
+  -e UID=$(id -u) \
+  -e GID=$(id -g) \
+  -v $HOME/OwnTone/etc:/etc/owntone \
+  -v $HOME/OwnTone/media:/srv/media \
+  -v $HOME/OwnTone/cache:/var/cache/owntone \
+  -v $HOME/OwnTone/log:/var/log/owntone \
+  --restart unless-stopped \
+  docker.io/owntone/owntone:latest
+```
 
 ## Releases
 
@@ -24,7 +46,7 @@ Mainly, the user and group running OwnTone, the directories where it stores the 
 
 ### User
 
-OwnTone should run with a specific user that you have to create on the host. If you don't specify any user identifier (`UID`) and group identifier (`GID`) (see section Run), then the user and group with identifier 1000 will be used.
+OwnTone should run with a specific user that you have to create on the host. If you don’t specify any user identifier (`UID`) and group identifier (`GID`) (see section Run), then the user and group with identifier 1000 will be used.
 
 ### Directories
 
@@ -52,7 +74,7 @@ In the case you simply want to use the network of the container host, then you w
 #### Separate Network
 
 In specific situations, it is expected to have a container to be considered as a separate "machine" on the network.
-Thus, you won't have any limitation on ports you are using and therefore, you also won't have to worry about mapping ports.
+Thus, you won’t have any limitation on ports you are using and therefore, you also won’t have to worry about mapping ports.
 It gives as well the opportunity to have multiple OwnTone instances running in the same network.
 
 To create a new network, you can run the following command:
@@ -113,11 +135,12 @@ docker run -d \
   --network=<network>
   -e UID=<uid> \
   -e GID=<gid>
+  -v <configuration-location>:/etc/owntone \
   -v <media-location>:/srv/media \
-  -v <log-location>:/var/log/owntone \
   -v <database-location>:/var/cache/owntone \
+  -v <log-location>:/var/log/owntone \
   --restart unless-stopped \
-  owntone/owntone:<tag>
+  docker.io/owntone/owntone:<tag>
 ```
 
 Where
@@ -126,10 +149,11 @@ Where
 - `<network>` The type of network you are choosing. It can be the name of the network (e.g., `intnet` as in the example above), or the network mode `host`.
 - `<uid>` The identifier of the user that will start the OwnTone process.
 - `<gid>` The identifier of the group that is attached to the OwnTone user.
-- `<media-location>` The path where the media are stored. Be sure to provide the access to the user running OwnTone.
-- `<log-location>` The path where the log file is written.
-- `<database-location>` The path where the database is stored.
-- `<tag>` The tag identifies which release has to be deployed. There are two meta tags: `latest` for latest production release and `staging` for the latest staging release.
+- `<configuration-location>` The path where the configuration is stored.
+- `<media-location>` The path where the media are stored. Be sure to provide at least read access to the user running OwnTone.
+- `<database-location>` The path where the database is stored. Be sure to provide write access to the user running OwnTone.
+- `<log-location>` The path where the log file is written. Be sure to provide write access to the user running OwnTone.
+- `<tag>` The tag identifies which release has to be deployed. There are two meta tags: `latest` for latest production release and `staging` for the latest staging release (for more information, see the section Releases)
 
 #### Example
 
@@ -139,11 +163,12 @@ docker run -d \
   --network=host \
   -e UID=1000 \
   -e GID=1000 \
+  -v /etc/owntone:/etc/owntone \
   -v /mnt/media:/srv/media \
-  -v /var/log/owntone:/var/log/owntone \
   -v /var/cache/owntone:/var/cache/owntone \
+  -v /var/log/owntone:/var/log/owntone \
   --restart unless-stopped \
-  owntone/owntone:latest
+  docker.io/owntone/owntone:latest
 ```
 
 ### Compose Command
@@ -160,16 +185,17 @@ Hereunder, you have an example of a Compose file (`owntone.yaml`).
 version: "3.8"
 services:
   owntone:
-    image: owntone/owntone:latest
+    image: docker.io/owntone/owntone:latest
     container_name: OwnTone
     network_mode: host
     environment:
       - UID=1000
       - GID=1000
     volumes:
+      - /etc/owntone:/etc/owntone
       - /mnt/media:/srv/media
-      - /var/log/owntone:/var/log/owntone
       - /var/cache/owntone:/var/cache/owntone
+      - /var/log/owntone:/var/log/owntone
     restart: unless-stopped
 ```
 
