@@ -6,7 +6,7 @@ ARG PACKAGE_REPOSITORY_URL
 ARG REPOSITORY_URL=https://github.com/owntone/owntone-server.git
 ARG REPOSITORY_BRANCH=master
 ARG REPOSITORY_COMMIT
-ARG REPOSITORY_TAG
+ARG REPOSITORY_VERSION
 
 WORKDIR /tmp/source
 
@@ -42,8 +42,8 @@ RUN \
     protobuf-c-dev \
     sqlite-dev && \
   git clone -b ${REPOSITORY_BRANCH} ${REPOSITORY_URL} ./ && \
-  if [ ${COMMIT} ]; then git checkout ${COMMIT}; \
-  elif [ ${TAG} ]; then git checkout tags/${TAG}; fi && \
+  if [ ${REPOSITORY_COMMIT} ]; then git checkout ${REPOSITORY_COMMIT}; \
+  elif [ ${REPOSITORY_VERSION} ]; then git checkout tags/${REPOSITORY_VERSION}; fi && \
   cd web-src && \
   npm update -s --no-progress && \
   npm run -s build -- -l silent && \
