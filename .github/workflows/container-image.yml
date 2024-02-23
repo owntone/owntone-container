@@ -71,9 +71,18 @@ jobs:
 
   production:
     needs: preparation
+    outputs:
+      tags: ${{ steps.variables.outputs.tags }}
     runs-on: ubuntu-latest
     if: needs.preparation.outputs.version
     steps:
+      - name: Determine variables
+        id: variables
+        run: |
+          prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
+          rerun=${{ github.event.inputs.version }}
+          tags=$(printf "$prefix%s\n" ${rerun:+"latest"} "${{ needs.preparation.outputs.version }}")
+          echo $tags >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
@@ -94,5 +103,4 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: | 
-            ${{ env.NAMESPACE }}/${{ env.NAME }}:latest
-            ${{ env.NAMESPACE }}/${{ env.NAME }}:${{ needs.preparation.outputs.version }}
+            ${{ steps.variables.outputs.tags }}
