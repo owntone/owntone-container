@@ -89,7 +89,7 @@ jobs:
           build-args: |
             REPOSITORY_URL=${{ env.REPOSITORY_URL }}
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
-            REPOSITORY_TAG=${{ needs.preparation.outputs.version }}
+            REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
           file: ./Dockerfile
           push: true
