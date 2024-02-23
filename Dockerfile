@@ -100,7 +100,7 @@ RUN \
   sed -i \
     -e 's/\/srv\/music/\/srv\/media/g' \
     -e 's/\/var\/log/\/var\/log\/owntone/g' \
-    -e 's/^#.*trusted_networks/\ttrusted_networks = { "any" }/g' \
+    -e 's/^#\ttrusted_networks = .*$/\ttrusted_networks = { "any" }/g' \
     /usr/share/doc/owntone/examples/owntone.conf && \
   sed -i 's/^\(tty\d\:\:\)/#\1/g' /etc/inittab && \
   sed -i \
