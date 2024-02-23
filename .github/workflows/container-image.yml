@@ -25,11 +25,11 @@ jobs:
   preparation:
     runs-on: ubuntu-latest
     outputs:
-      commit: ${{ steps.next-stages.outputs.commit }}
-      version: ${{ steps.next-stages.outputs.version }}
+      commit: ${{ steps.variables.outputs.commit }}
+      version: ${{ steps.variables.outputs.version }}
     steps:
-      - name: Determine run of next stages
-        id: next-stages
+      - name: Determine variables
+        id: variables
         run: |
           registry=https://hub.docker.com/v2/namespaces/$NAMESPACE/repositories/$NAME/tags
           git clone -q -b $REPOSITORY_BRANCH $REPOSITORY_URL source
@@ -43,9 +43,18 @@ jobs:
 
   staging:
     needs: preparation
+    outputs:
+      tags: ${{ steps.variables.outputs.tags }}
     runs-on: ubuntu-latest
     if: needs.preparation.outputs.commit
     steps:
+      - name: Determine variables
+        id: variables
+        run: |
+          prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
+          tags=${prefix}${{ needs.preparation.outputs.commit }}
+          [[ -z ${{ github.event.inputs.commit }} ]] && tags+=",${prefix}staging"
+          echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
@@ -65,9 +74,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: | 
-            ${{ env.NAMESPACE }}/${{ env.NAME }}:staging
-            ${{ env.NAMESPACE }}/${{ env.NAME }}:${{ needs.preparation.outputs.commit }}
+          tags: ${{ steps.variables.outputs.tags }}
+            
 
   production:
     needs: preparation
@@ -80,8 +88,8 @@ jobs:
         id: variables
         run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
-          rerun=${{ github.event.inputs.version }}
-          tags=$(printf "${prefix}%s" ${rerun:+"latest,"})${prefix}${{ needs.preparation.outputs.version }}
+          tags=${prefix}${{ needs.preparation.outputs.version }}
+          [[ -z ${{ github.event.inputs.version }} ]] && tags+=",${prefix}latest"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v3
@@ -102,5 +110,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: | 
-            ${{ steps.variables.outputs.tags }}
+          tags: ${{ steps.variables.outputs.tags }}
