@@ -7,6 +7,13 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit'
+        required: false
+      version:
+        description: 'Version'
+        required: false
 
 env:
   NAME: ${{ vars.NAME }}
@@ -28,10 +35,10 @@ jobs:
           git clone -q -b $REPOSITORY_BRANCH $REPOSITORY_URL source
           cd source
           commit=$(git log --branches -1 --pretty=format:"%h")
-          [[ $(curl -LI ${registry}/${commit} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && commit=$COMMIT
+          [[ $(curl -LI ${registry}/${commit} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && commit=${{ github.event.inputs.commit }}
           echo "commit=${commit}" >> $GITHUB_OUTPUT
           version=$(git describe --tags $(git rev-list --tags --max-count=1))
-          [[ $(curl -LI ${registry}/${version} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && version=$VERSION
+          [[ $(curl -LI ${registry}/${version} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && version=${{ github.event.inputs.version }}
           echo "version=${version}" >> $GITHUB_OUTPUT
 
   staging:
