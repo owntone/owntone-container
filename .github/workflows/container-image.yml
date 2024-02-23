@@ -81,7 +81,7 @@ jobs:
         run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
           rerun=${{ github.event.inputs.version }}
-          echo tags=${rerun:+"latest,"} "${{ needs.preparation.outputs.version }}" >> $GITHUB_OUTPUT
+          echo tags=$("prefix${rerun:+"latest,"}" "$prefix${{ needs.preparation.outputs.version }}") >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
