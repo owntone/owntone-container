@@ -50,7 +50,7 @@ jobs:
         run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
           tags=${prefix}${{ needs.preparation.outputs.commit }}
-          [[ -z ${{ github.event.inputs.commit }} ]] && tags+=",${prefix}staging"
+          [[ -z "${{ github.event.inputs.commit }}" ]] && tags+=",${prefix}staging"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v3
@@ -85,7 +85,7 @@ jobs:
         run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
           tags=${prefix}${{ needs.preparation.outputs.version }}
-          [[ -z ${{ github.event.inputs.version }} ]] && tags+=",${prefix}latest"
+          [[ -z "${{ github.event.inputs.version }}" ]] && tags+=",${prefix}latest"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v3
