@@ -4,6 +4,10 @@ The OwnTone container offers a hassle-free solution for deploying the OwnTone me
 
 This approach enhances reliability, simplifies version control, and allows users to focus on using OwnTone’s media server features rather than dealing with complicated installation processes.
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/owntone/owntone.svg)](https://hub.docker.com/r/owntone/owntone)
+[![Docker Stars](https://img.shields.io/docker/stars/owntone/owntone)](https://hub.docker.com/r/owntone/owntone)
+[![Docker Image Size](https://img.shields.io/docker/image-size/owntone/owntone)](https://hub.docker.com/r/owntone/owntone)
+
 ## Quick Start
 
 If you can’t wait to run OwnTone, here is a quick start procedure. It implies that you already have a running [Docker](https://www.docker.com) or [Podman](https://podman.io) installation.
