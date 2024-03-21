@@ -80,7 +80,6 @@ RUN \
     curl \
     dbus \
     ffmpeg \
-    gcompat \
     gnutls \
     json-c \
     libevent \
