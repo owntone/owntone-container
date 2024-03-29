@@ -1,6 +1,6 @@
-ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.18
+ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.19
 
-FROM alpine:3.18 AS build
+FROM alpine:3.19 AS build
 
 ARG PACKAGE_REPOSITORY_URL
 ARG REPOSITORY_URL=https://github.com/owntone/owntone-server.git
@@ -65,7 +65,7 @@ RUN \
   install -D etc/owntone/owntone.conf usr/share/doc/owntone/examples/owntone.conf && \
   rm -rf var etc
 
-FROM alpine:3.18 AS runtime
+FROM alpine:3.19 AS runtime
 
 ARG PACKAGE_REPOSITORY_URL
 
@@ -112,7 +112,7 @@ RUN \
     -e 's/#rc_sys=".*"/rc_sys="docker"/g' \
     /etc/rc.conf && \
   rc-update add syslog boot && \
-  rc-update add owntone boot && \
+  rc-update add owntone default && \
   install -D /dev/null /run/openrc/softlevel
 
 ENTRYPOINT ["/sbin/init"]

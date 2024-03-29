@@ -1,0 +1,24 @@
+#!/sbin/openrc-run
+
+name="${RC_SVCNAME}"
+description="Avahi Daemon"
+
+pidfile="/run/${RC_SVCNAME}/pid"
+dbussocket="/run/dbus/system_bus_socket"
+
+command="/usr/sbin/avahi-daemon"
+command_args_background="-D"
+
+start_pre() {
+	if [ ! -S "${dbussocket}" ]; then
+	  sleep 15
+	  start_pre
+	fi
+	return 0
+}
+
+depend() {
+	before netmount nfsmount
+	use net
+	need dbus
+}
