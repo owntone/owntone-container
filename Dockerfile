@@ -98,9 +98,12 @@ RUN \
     udev-init-scripts-openrc && \
   rm /etc/avahi/services/* &&\
   sed -i \
-    -e 's/\/srv\/music/\/srv\/media/g' \
-    -e 's/\/var\/log/\/var\/log\/owntone/g' \
-    -e 's/^#\ttrusted_networks = .*$/\ttrusted_networks = { "any" }/g' \
+    -e 's|\(.*\)\(db_path = "\).\+\(".*\)|\t\2/var/cache/owntone/database.db\3|' \
+    -e 's|\(.*\)\(db_backup_path = "\).\+\(".*\)|\t\2/var/cache/owntone/database.bak\3|' \
+    -e 's|\(.*\)\(cache_path = "\).\+\(".*\)|\t\2/var/cache/owntone/cache.db\3|' \
+    -e 's|\(.*\)\(logfile = "\).\+\(".*\)|\t\2/dev/stderr\3|' \
+    -e 's|\(.*\)\(directories = { \).\+\( }.*\)|\t\2"/srv/media"\3|' \
+    -e 's|\(.*\)\(trusted_networks = { \).\+\( }.*\)|\t\2"any"\3|' \
     /usr/share/doc/owntone/examples/owntone.conf && \
   sed -i 's/^\(tty\d\:\:\)/#\1/g' /etc/inittab && \
   sed -i \

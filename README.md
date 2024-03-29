@@ -12,29 +12,32 @@ This approach enhances reliability, simplifies version control, and allows users
 
 If you can’t wait to run OwnTone, here is a quick start procedure. It implies that you already have a running [Docker](https://www.docker.com) or [Podman](https://podman.io) installation.
 
-```bash
-# Create the minimal structure
-mkdir -p $HOME/OwnTone/{etc,media,cache,log}
+1. Create a minimal structure, assuming everything is in the home directory
 
-# Launch the container
-docker run -d \
-  --name=OwnTone \
-  --network=host \
-  -e UID=$(id -u) \
-  -e GID=$(id -g) \
-  -v $HOME/OwnTone/etc:/etc/owntone \
-  -v $HOME/OwnTone/media:/srv/media \
-  -v $HOME/OwnTone/cache:/var/cache/owntone \
-  -v $HOME/OwnTone/log:/var/log/owntone \
-  --restart unless-stopped \
-  docker.io/owntone/owntone:latest
-```
+    ```shell
+    mkdir -p $HOME/OwnTone/{etc,media,cache}
+    ```
+
+2. Launch the container
+
+    ```shell
+    docker run -d \
+      --name=OwnTone \
+      --network=host \
+      -e UID=$(id -u) \
+      -e GID=$(id -g) \
+      -v $HOME/OwnTone/etc:/etc/owntone \
+      -v $HOME/OwnTone/media:/srv/media \
+      -v $HOME/OwnTone/cache:/var/cache/owntone \
+      --restart unless-stopped \
+      docker.io/owntone/owntone:latest
+    ```
 
 ## Releases
 
 The OwnTone container comes in two flavours: the **production** (tag `latest`) and the **staging** (tag `staging`) releases.
 
-The staging release is designed for users who seek access to the latest features or bug fixes, providing a platform for testing and experimentation. In contrast, the production release is characterized by heightened stability, making it suitable for environments where reliability is paramount.
+The staging release is designed for users who seek access to the latest features or bug fixes, providing a platform for testing and experimentation. In contrast, the production release is characterised by heightened stability, making it suitable for environments where reliability is paramount.
 
 ## Deployment
 
@@ -46,9 +49,9 @@ The deployment procedure can be described in 2 main steps.
 ## Setup
 
 This OwnTone container needs a certain amount of parameters to be configured to work properly.
-Mainly, the user and group running OwnTone, the directories where it stores the database containing the metadata, the logging entries of your media, and the network on which it is connected.
+Mainly, the [user and group](#user-and-group) running OwnTone, the [directories](#directories) where the database containing the metadata and your media are located, and the [network](#network) on which it is connected.
 
-### User
+### User and Group
 
 OwnTone should run with a specific user that you have to create on the host. If you don’t specify any user identifier (`UID`) and group identifier (`GID`) (see section Run), then the user and group with identifier 1000 will be used.
 
@@ -56,13 +59,14 @@ OwnTone should run with a specific user that you have to create on the host. If 
 
 The following directories, should be set up.
 
+- **Configuration directory** - contains the configuration of OwnTone (by default `/etc/owntone/`).
 - **Media directory** - contains all the media which will be available to be streamed by OwnTone (by default `/srv/media`).
-- **Logging directory** - is where the log file (`owntone.log`) of OwnTone is located (by default `/var/log/owntone`).
-- **Cache directory** - indicates where the OwnTone database (`songs3.db`) is being located (by default `/var/cache/owntone`).
+- **Cache directory** - indicates where the OwnTone database (`database.db`) is being located (by default `/var/cache/owntone`).
 
 The above mentioned directories can all be changed to fit your context.
 
-Moreover, you must ensure that the above mentioned directories are writable to the user identifier and group identifier given at startup.
+Furthermore, you must ensure that at least the cache directory is writable by the user and group identifiers provided at startup.
+Depending on your configuration, the media directory might need to be writeable by the user and group identifiers provided at startup.
 
 ### Network
 
@@ -83,7 +87,7 @@ It gives as well the opportunity to have multiple OwnTone instances running in t
 
 To create a new network, you can run the following command:
 
-```bash
+```shell
 docker network create \
   --driver macvlan \
   --subnet=<subnet> \
@@ -109,7 +113,7 @@ Moreover, the router is configured to lease IP addresses, through DHCP, from `19
 Thus, the range of IPs leased by the router will not overlap with the range defined by the container network.
 Indeed, the new network has an IP range from `192.168.0.192` to `192.168.0.222`.
 
-```bash
+```shell
 docker network create \
   --driver macvlan \
   --subnet=192.168.0.0/24 \
@@ -133,7 +137,7 @@ The most direct way to start the OwnTone container is to use the [Docker Run](ht
 
 #### Command
 
-```bash
+```shell
 docker run -d \
   --name=<container-name> \
   --network=<network>
@@ -142,7 +146,6 @@ docker run -d \
   -v <configuration-location>:/etc/owntone \
   -v <media-location>:/srv/media \
   -v <database-location>:/var/cache/owntone \
-  -v <log-location>:/var/log/owntone \
   --restart unless-stopped \
   docker.io/owntone/owntone:<tag>
 ```
@@ -156,12 +159,11 @@ Where
 - `<configuration-location>` The path where the configuration is stored.
 - `<media-location>` The path where the media are stored. Be sure to provide at least read access to the user running OwnTone.
 - `<database-location>` The path where the database is stored. Be sure to provide write access to the user running OwnTone.
-- `<log-location>` The path where the log file is written. Be sure to provide write access to the user running OwnTone.
-- `<tag>` The tag identifies which release has to be deployed. There are two meta tags: `latest` for latest production release and `staging` for the latest staging release (for more information, see the section Releases)
+- `<tag>` The tag identifies which release has to be deployed. There are two meta tags: `latest` for latest production release and `staging` for the latest staging release (for more information, see the section [Releases](#releases))
 
-#### Example
+#### Example with Docker Run Command
 
-```bash
+```shell
 docker run -d \
   --name=OwnTone \
   --network=host \
@@ -170,7 +172,6 @@ docker run -d \
   -v /etc/owntone:/etc/owntone \
   -v /mnt/media:/srv/media \
   -v /var/cache/owntone:/var/cache/owntone \
-  -v /var/log/owntone:/var/log/owntone \
   --restart unless-stopped \
   docker.io/owntone/owntone:latest
 ```
@@ -199,13 +200,12 @@ services:
       - /etc/owntone:/etc/owntone
       - /mnt/media:/srv/media
       - /var/cache/owntone:/var/cache/owntone
-      - /var/log/owntone:/var/log/owntone
     restart: unless-stopped
 ```
 
-#### Example
+#### Example with Docker Compose Command
 
-```bash
+```shell
 docker compose -f owntone.yaml
 ```
 
@@ -215,7 +215,7 @@ Once you have the container running, you might want to automate the start and st
 If your system runs [systemd](https://systemd.io), it might be useful to automate the start of OwnTone with a Unit file.
 With `podman generate systemd`, you can create a scaffolding [unit file](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html) that you will be able to adapt later on.
 
-```bash
+```shell
 podman generate systemd --new --files --name <container-name>
 ```
 
@@ -240,12 +240,12 @@ The Dockerfile can take a few build arguments:
 - `REPOSITORY_URL` The URL of the source code of OwnTone. By default, the official source code repository is considered.
 - `REPOSITORY_BRANCH` The branch that will be used as the source code base.
 - `REPOSITORY_COMMIT` The commit on which the build will be based.
-- `REPOSITORY_TAG` The tag on which the build will be based.
+- `REPOSITORY_VERSION` The version on which the build will be based.
 
 #### Notes
 
-- If both a commit (commit identifier) and a tag are provided, the commit has precedence over the tag.
-- If none of the above (commit or tag) are provided, the last commit of the specified branch is provided.
+- If both a commit (commit identifier) and a version are provided, the commit has precedence over the version.
+- If none of the above (commit or version) are provided, the last commit of the specified branch is provided.
 - If no branch is provided, the default `master` branch is used.
 - If no URL for the repository is provided, the original OwnTone repository is used.
 
