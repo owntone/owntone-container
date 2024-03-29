@@ -116,3 +116,5 @@ RUN \
   install -D /dev/null /run/openrc/softlevel
 
 ENTRYPOINT ["/sbin/init"]
+
+HEALTHCHECK CMD ["/sbin/rc-service", "owntone", "status"]
