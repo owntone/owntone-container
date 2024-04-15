@@ -6,7 +6,8 @@ This approach enhances reliability, simplifies version control, and allows users
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/owntone/owntone.svg)](https://hub.docker.com/r/owntone/owntone)
 [![Docker Stars](https://img.shields.io/docker/stars/owntone/owntone)](https://hub.docker.com/r/owntone/owntone)
-[![Docker Image Size](https://img.shields.io/docker/image-size/owntone/owntone)](https://hub.docker.com/r/owntone/owntone)
+[![Docker Image Size (amd64)](https://img.shields.io/docker/image-size/owntone/owntone?label=image+size+amd64&arch=amd64)](https://hub.docker.com/r/owntone/owntone)
+[![Docker Image Size (arm64)](https://img.shields.io/docker/image-size/owntone/owntone?label=image+size+arm64&arch=arm64)](https://hub.docker.com/r/owntone/owntone)
 
 ## Quick Start
 
@@ -251,7 +252,8 @@ The Dockerfile can take a few build arguments:
 
 ## Architectures
 
-Currently, this containerisation supports the x86-64 architecture.
+Currently, this containerisation supports the amd64 (x86-64) and arm64 (aarch64) architectures.
+If you want to use a specific architecture, you have to specify the option `--platform` with `docker` or `podman`.
 
 ## Contribution
 
