@@ -6,11 +6,19 @@ on:
   workflow_dispatch:
     inputs:
       commit:
-        description: 'Commit'
+        description: 'Commit identifier'
         required: false
+      staging:
+        description: 'Include tag ''staging'''
+        required: false
+        type: boolean
       version:
-        description: 'Version'
+        description: 'Version identifier'
         required: false
+      latest:
+        description: 'Include tag ''latest'''
+        required: false
+        type: boolean
 
 env:
   NAME: ${{ vars.NAME }}
@@ -50,7 +58,7 @@ jobs:
         run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
           tags=${prefix}${{ needs.preparation.outputs.commit }}
-          [[ -z "${{ github.event.inputs.commit }}" ]] && tags+=",${prefix}staging"
+          [[ -z "${{ github.event.inputs.commit }}" || "${{ github.event.inputs.staging }}" == "true" ]] && tags+=",${prefix}staging"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -87,7 +95,7 @@ jobs:
         run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
           tags=${prefix}${{ needs.preparation.outputs.version }}
-          [[ -z "${{ github.event.inputs.version }}" ]] && tags+=",${prefix}latest"
+          [[ -z "${{ github.event.inputs.version }}" || "${{ github.event.inputs.latest }}" == "true" ]] && tags+=",${prefix}latest"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v4
