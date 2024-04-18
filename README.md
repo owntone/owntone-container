@@ -213,11 +213,33 @@ docker compose -f owntone.yaml
 ### systemd
 
 Once you have the container running, you might want to automate the start and stop of OwnTone with your system.
-If your system runs [systemd](https://systemd.io), it might be useful to automate the start of OwnTone with a Unit file.
-With `podman generate systemd`, you can create a scaffolding [unit file](https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html) that you will be able to adapt later on.
 
-```shell
-podman generate systemd --new --files --name <container-name>
+If your system runs [systemd](https://systemd.io), it might be useful to automate the start of OwnTone with a Unit file.
+You can find a list of presenting the adoption of systemd in Gnu/Linux distributions [here](https://en.wikipedia.org/wiki/Systemd#Adoption).
+
+Using a [Podman Quadlet](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html), makes it efficient to start your OwnTone container.
+
+Below, an example of such a configuration file. Usually, this file (e.g., `owntone.container`) should be located in the `/etc/containers/systemd/`.
+
+```conf
+[Unit]
+Description=OwnTone Container
+
+[Container]
+ContainerName=owntone
+Image=docker.io/owntone/owntone:latest
+AutoUpdate=registry
+Network=host
+HostName=owntone
+Environment=UID=1000
+Environment=GID=1000
+Mount=type=bind,source=/etc/owntone,destination=/etc/owntone
+Mount=type=bind,source=/mnt/media,destination=/srv/media
+Mount=type=bind,source=/var/cache/owntone,destination=/var/cache/owntone
+
+[Install]
+WantedBy=multi-user.target default.target
+
 ```
 
 ## Build
