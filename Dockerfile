@@ -36,8 +36,8 @@ RUN \
     libtool \
     libunistring-dev \
     libwebsockets-dev \
+    libxml2-dev \
     make \
-    mxml-dev \
     npm \
     protobuf-c-dev \
     sqlite-dev && \
@@ -89,7 +89,7 @@ RUN \
     libunistring \
     libuuid \
     libwebsockets \
-    mxml \
+    libxml2 \
     openrc \
     protobuf-c \
     shadow \
