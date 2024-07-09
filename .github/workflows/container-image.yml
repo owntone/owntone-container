@@ -99,6 +99,8 @@ jobs:
           echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preparation.outputs.version }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
