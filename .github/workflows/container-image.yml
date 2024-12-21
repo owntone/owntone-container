@@ -72,13 +72,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           build-args: |
             REPOSITORY_URL=${{ env.REPOSITORY_URL }}
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_COMMIT=${{ needs.preparation.outputs.commit }}
           context: .
+          outputs: type=docker
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.variables.outputs.tags }}
@@ -111,13 +112,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           build-args: |
             REPOSITORY_URL=${{ env.REPOSITORY_URL }}
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
+          outputs: type=docker
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.variables.outputs.tags }}
