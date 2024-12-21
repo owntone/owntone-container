@@ -82,6 +82,7 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_COMMIT=${{ needs.preparation.outputs.commit }}
           context: .
+          load: true
           platforms: ${{ matrix.platforms }}
           push: true
           tags: ${{ steps.variables.outputs.tags }}
@@ -124,6 +125,7 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
+          load: true
           platforms: ${{ matrix.platforms }}
           push: true
           tags: ${{ steps.variables.outputs.tags }}
