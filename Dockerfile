@@ -118,4 +118,4 @@ RUN \
 ENTRYPOINT ["/sbin/init"]
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 \
-  CMD ["/sbin/rc-service", "owntone", "status"]
+  CMD /sbin/rc-service owntone status || exit 1
