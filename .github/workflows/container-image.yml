@@ -51,6 +51,9 @@ jobs:
     outputs:
       tags: ${{ steps.variables.outputs.tags }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platforms: [ 'linux/amd64', 'linux/arm64']
     if: needs.preparation.outputs.commit
     steps:
       - name: Determine variables
@@ -79,8 +82,7 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_COMMIT=${{ needs.preparation.outputs.commit }}
           context: .
-          outputs: type=docker
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platforms }}
           push: true
           tags: ${{ steps.variables.outputs.tags }}
 
@@ -89,6 +91,9 @@ jobs:
     outputs:
       tags: ${{ steps.variables.outputs.tags }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platforms: [ 'linux/amd64', 'linux/arm64']
     if: needs.preparation.outputs.version
     steps:
       - name: Determine variables
@@ -119,7 +124,6 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
-          outputs: type=docker
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platforms }}
           push: true
           tags: ${{ steps.variables.outputs.tags }}
