@@ -50,7 +50,6 @@ RUN \
   cd .. && \
   autoreconf -i && \
   ./configure \
-    -q \
     --disable-install_systemd \
     --disable-install_user \
     --enable-chromecast \
