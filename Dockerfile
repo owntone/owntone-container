@@ -60,6 +60,7 @@ RUN \
     --mandir=/usr/share/man \
     --prefix=/usr \
     --sysconfdir=/etc/owntone && \
+  cat config.log && \
   make DESTDIR=/tmp/build install && \
   cd /tmp/build && \
   install -D etc/owntone/owntone.conf usr/share/doc/owntone/examples/owntone.conf && \
