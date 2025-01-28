@@ -45,8 +45,8 @@ RUN \
   if [ ${REPOSITORY_COMMIT} ]; then git checkout ${REPOSITORY_COMMIT}; \
   elif [ ${REPOSITORY_VERSION} ]; then git checkout tags/${REPOSITORY_VERSION}; fi && \
   cd web-src && \
-  npm install -s --no-progress && \
-  npm run -s build -- -l silent && \
+  npm install && \
+  npm run build && \
   cd .. && \
   autoreconf -i && \
   ./configure \
@@ -60,7 +60,7 @@ RUN \
     --mandir=/usr/share/man \
     --prefix=/usr \
     --sysconfdir=/etc/owntone && \
-  make -s DESTDIR=/tmp/build install && \
+  make DESTDIR=/tmp/build install && \
   cd /tmp/build && \
   install -D etc/owntone/owntone.conf usr/share/doc/owntone/examples/owntone.conf && \
   rm -rf var etc
