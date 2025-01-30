@@ -19,6 +19,10 @@ on:
         description: 'Include tag ''latest'''
         required: false
         type: boolean
+      disable-ui:
+        description: 'Disable UI build'
+        required: false
+        type: boolean
 
 env:
   NAME: ${{ vars.NAME }}
@@ -75,12 +79,13 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           build-args: |
+            DISABLE_UI_BUILD=${{ github.event.inputs.disable-ui }}
             REPOSITORY_URL=${{ env.REPOSITORY_URL }}
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_COMMIT=${{ needs.preparation.outputs.commit }}
           context: .
           platforms: 'linux/arm/v7'
-          push: true
+          push: false
           tags: ${{ steps.variables.outputs.tags }}
 
   production:
@@ -114,10 +119,11 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           build-args: |
+            DISABLE_UI_BUILD=${{ github.event.inputs.disable-ui }}
             REPOSITORY_URL=${{ env.REPOSITORY_URL }}
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
           platforms: 'linux/arm/v7'
-          push: true
+          push: false
           tags: ${{ steps.variables.outputs.tags }}
