@@ -45,12 +45,7 @@ RUN \
   git clone -b ${REPOSITORY_BRANCH} ${REPOSITORY_URL} ./ && \
   if [ ${REPOSITORY_COMMIT} ]; then git checkout ${REPOSITORY_COMMIT}; \
   elif [ ${REPOSITORY_VERSION} ]; then git checkout tags/${REPOSITORY_VERSION}; fi && \
-  if [ -z "$DISABLE_UI_BUILD" ]; then \
-  cd web-src && \
-  npm install && \
-  npm run build && \
-  cd .. && \
-  fi && \
+  if [ ${DISABLE_UI_BUILD} ]; then cd web-src; npm install; npm run build; cd ..; fi && \
   autoreconf -i && \
   ./configure \
     --disable-install_systemd \
