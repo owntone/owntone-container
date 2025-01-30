@@ -2,6 +2,7 @@ ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.19
 
 FROM alpine:3.19 AS build
 
+ARG DISABLE_UI_BUILD
 ARG PACKAGE_REPOSITORY_URL
 ARG REPOSITORY_URL=https://github.com/owntone/owntone-server.git
 ARG REPOSITORY_BRANCH=master
@@ -44,10 +45,12 @@ RUN \
   git clone -b ${REPOSITORY_BRANCH} ${REPOSITORY_URL} ./ && \
   if [ ${REPOSITORY_COMMIT} ]; then git checkout ${REPOSITORY_COMMIT}; \
   elif [ ${REPOSITORY_VERSION} ]; then git checkout tags/${REPOSITORY_VERSION}; fi && \
+  if [ -z "$DISABLE_UI_BUILD" ]; then \
   cd web-src && \
   npm install && \
   npm run build && \
   cd .. && \
+  fi && \
   autoreconf -i && \
   ./configure \
     --disable-install_systemd \
