@@ -1,4 +1,4 @@
-name: OwnTone Container
+name: OwnTone Container (Self-Hosted)
 
 on:
   schedule:
