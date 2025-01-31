@@ -79,7 +79,7 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_COMMIT=${{ needs.preparation.outputs.commit }}
           context: .
-          platforms: 'linux/amd64,linux/arm64,linux/arm/v7'
+          platforms: 'linux/amd64,linux/arm64'
           push: true
           tags: ${{ steps.variables.outputs.tags }}
 
@@ -118,6 +118,6 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
-          platforms: 'linux/amd64,linux/arm64,linux/arm/v7'
+          platforms: 'linux/amd64,linux/arm64'
           push: true
           tags: ${{ steps.variables.outputs.tags }}
