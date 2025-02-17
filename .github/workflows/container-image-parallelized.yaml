@@ -53,11 +53,21 @@ jobs:
 
   staging:
     needs: preparation
+    outputs:
+      tags: ${{ steps.variables.outputs.tags }}
     runs-on: ubuntu-latest
+    if: needs.preparation.outputs.commit
     strategy:
       matrix:
         platform: ['linux/amd64', 'linux/arm64', 'linux/arm/v7']
     steps:
+      - name: Determine variables
+        id: variables
+        run: |
+          prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
+          tags=${prefix}${{ needs.preparation.outputs.commit }}
+          [[ -z "${{ github.event.inputs.commit }}" || "${{ github.event.inputs.staging }}" == "true" ]] && tags+=",${prefix}staging"
+          echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v4
       - name: Set up QEMU
@@ -79,7 +89,7 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           push: true
-          tags: ${{ needs.preparation.outputs.tags }}
+          tags: ${{ steps.variables.outputs.tags }}
 
   production:
     needs: preparation
@@ -87,6 +97,9 @@ jobs:
       tags: ${{ steps.variables.outputs.tags }}
     runs-on: ubuntu-latest
     if: needs.preparation.outputs.version
+    strategy:
+      matrix:
+        platform: ['linux/amd64', 'linux/arm64', 'linux/arm/v7']
     steps:
       - name: Determine variables
         id: variables
@@ -108,7 +121,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push for all platforms
+      - name: Build and push for ${{ matrix.platform }}
         uses: docker/build-push-action@v6
         with:
           build-args: |
@@ -116,6 +129,6 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
-          platforms: 'linux/amd64,linux/arm64,linux/arm/v7'
+          platforms: ${{ matrix.platform }}
           push: true
           tags: ${{ steps.variables.outputs.tags }}
