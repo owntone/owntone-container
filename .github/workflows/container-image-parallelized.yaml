@@ -51,7 +51,7 @@ jobs:
           [[ -z "${{ github.event.inputs.commit }}" || "${{ github.event.inputs.staging }}" == "true" ]] && tags+=",${prefix}staging"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
 
-  build:
+  staging:
     needs: preparation
     runs-on: ubuntu-latest
     strategy:
