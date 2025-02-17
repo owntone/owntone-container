@@ -1,4 +1,4 @@
-name: OwnTone Container Parallelized
+name: OwnTone Container
 
 on:
   schedule:
@@ -32,6 +32,7 @@ jobs:
     outputs:
       commit: ${{ steps.variables.outputs.commit }}
       version: ${{ steps.variables.outputs.version }}
+      tags: ${{ steps.variables.outputs.tags }}
     steps:
       - name: Determine variables
         id: variables
@@ -45,29 +46,17 @@ jobs:
           version=$(git describe --tags $(git rev-list --tags --max-count=1))
           [[ $(curl -LI ${registry}/${version} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && version=${{ github.event.inputs.version }}
           echo "version=${version}" >> $GITHUB_OUTPUT
-
-  staging:
-    needs: preparation
-    outputs:
-      tags: ${{ steps.variables.outputs.tags }}
-    runs-on: ubuntu-latest
-    if: needs.preparation.outputs.commit
-    steps:
-      - name: Determine variables
-        id: variables
-        run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
-          tags=${prefix}${{ needs.preparation.outputs.commit }}
+          tags=${prefix}${commit}
           [[ -z "${{ github.event.inputs.commit }}" || "${{ github.event.inputs.staging }}" == "true" ]] && tags+=",${prefix}staging"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
 
-  # Build and push jobs for different architectures using matrix strategy
   build:
     needs: preparation
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: ['linux/amd64', 'linux/arm64', 'linux/arm/v7']  # Matrix of supported architectures
+        platform: ['linux/amd64', 'linux/arm64', 'linux/arm/v7']
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -88,9 +77,9 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_COMMIT=${{ needs.preparation.outputs.commit }}
           context: .
-          platforms: ${{ matrix.platform }}  # Use the platform from the matrix
+          platforms: ${{ matrix.platform }}
           push: true
-          tags: ${{ steps.variables.outputs.tags }}
+          tags: ${{ needs.preparation.outputs.tags }}
 
   production:
     needs: preparation
@@ -127,6 +116,6 @@ jobs:
             REPOSITORY_BRANCH=${{ env.REPOSITORY_BRANCH }}
             REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
-          platforms: 'linux/amd64,linux/arm64,linux/arm/v7'  # Build for all platforms
+          platforms: 'linux/amd64,linux/arm64,linux/arm/v7'
           push: true
           tags: ${{ steps.variables.outputs.tags }}
