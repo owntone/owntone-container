@@ -1,4 +1,4 @@
-name: OwnTone Container
+name: OwnTone Container Parallelized
 
 on:
   schedule:
