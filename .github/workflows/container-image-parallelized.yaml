@@ -32,7 +32,6 @@ jobs:
     outputs:
       commit: ${{ steps.variables.outputs.commit }}
       version: ${{ steps.variables.outputs.version }}
-      tags: ${{ steps.variables.outputs.tags }}
     steps:
       - name: Determine variables
         id: variables
@@ -46,30 +45,10 @@ jobs:
           version=$(git describe --tags $(git rev-list --tags --max-count=1))
           [[ $(curl -LI ${registry}/${version} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && version=${{ github.event.inputs.version }}
           echo "version=${version}" >> $GITHUB_OUTPUT
-          prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
-          tags=${prefix}${commit}
-          [[ -z "${{ github.event.inputs.commit }}" || "${{ github.event.inputs.staging }}" == "true" ]] && tags+=",${prefix}staging"
-          echo "tags=${tags}" >> $GITHUB_OUTPUT
 
-  staging:
-    needs: preparation
-    outputs:
-      tags: ${{ steps.variables.outputs.tags }}
+  setup:
     runs-on: ubuntu-latest
-    if: needs.preparation.outputs.commit
-    strategy:
-      matrix:
-        platform: ['linux/amd64', 'linux/arm64', 'linux/arm/v7']
     steps:
-      - name: Determine variables
-        id: variables
-        run: |
-          prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
-          tags=${prefix}${{ needs.preparation.outputs.commit }}
-          [[ -z "${{ github.event.inputs.commit }}" || "${{ github.event.inputs.staging }}" == "true" ]] && tags+=",${prefix}staging"
-          echo "tags=${tags}" >> $GITHUB_OUTPUT
-      - name: Check out the repository
-        uses: actions/checkout@v4
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -79,7 +58,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push for ${{ matrix.platform }}
+
+  staging-build:
+    needs: [preparation, setup]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: ['linux/amd64', 'linux/arm64', 'linux/arm/v7']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preparation.outputs.commit }}
+      - name: Build staging image for ${{ matrix.platform }}
         uses: docker/build-push-action@v6
         with:
           build-args: |
@@ -88,40 +79,34 @@ jobs:
             REPOSITORY_COMMIT=${{ needs.preparation.outputs.commit }}
           context: .
           platforms: ${{ matrix.platform }}
-          push: true
-          tags: ${{ steps.variables.outputs.tags }}
+          outputs: type=registry,name=${{ env.NAMESPACE }}/${{ env.NAME }},push=false
 
-  production:
-    needs: preparation
-    outputs:
-      tags: ${{ steps.variables.outputs.tags }}
+  staging-merge:
+    needs: [staging-build]
     runs-on: ubuntu-latest
-    if: needs.preparation.outputs.version
+    steps:
+      - name: Create and push multi-architecture staging image
+        run: |
+          docker buildx imagetools create \
+            --tag ${{ env.NAMESPACE }}/${{ env.NAME }}:${{ needs.preparation.outputs.commit }} \
+            --tag ${{ env.NAMESPACE }}/${{ env.NAME }}:staging \
+            ${{ env.NAMESPACE }}/${{ env.NAME }}:linux/amd64 \
+            ${{ env.NAMESPACE }}/${{ env.NAME }}:linux/arm64 \
+            ${{ env.NAMESPACE }}/${{ env.NAME }}:linux/arm/v7
+
+  production-build:
+    needs: [preparation, setup]
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         platform: ['linux/amd64', 'linux/arm64', 'linux/arm/v7']
     steps:
-      - name: Determine variables
-        id: variables
-        run: |
-          prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
-          tags=${prefix}${{ needs.preparation.outputs.version }}
-          [[ -z "${{ github.event.inputs.version }}" || "${{ github.event.inputs.latest }}" == "true" ]] && tags+=",${prefix}latest"
-          echo "tags=${tags}" >> $GITHUB_OUTPUT
-      - name: Check out the repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.preparation.outputs.version }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Sign into Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push for ${{ matrix.platform }}
+
+      - name: Build production image for ${{ matrix.platform }}
         uses: docker/build-push-action@v6
         with:
           build-args: |
@@ -130,5 +115,17 @@ jobs:
             REPOSITORY_VERSION=${{ needs.preparation.outputs.version }}
           context: .
           platforms: ${{ matrix.platform }}
-          push: true
-          tags: ${{ steps.variables.outputs.tags }}
+          outputs: type=registry,name=${{ env.NAMESPACE }}/${{ env.NAME }},push=false
+
+  production-merge:
+    needs: [production-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create and push multi-architecture production image
+        run: |
+          docker buildx imagetools create \
+            --tag ${{ env.NAMESPACE }}/${{ env.NAME }}:${{ needs.preparation.outputs.version }} \
+            --tag ${{ env.NAMESPACE }}/${{ env.NAME }}:latest \
+            ${{ env.NAMESPACE }}/${{ env.NAME }}:linux/amd64 \
+            ${{ env.NAMESPACE }}/${{ env.NAME }}:linux/arm64 \
+            ${{ env.NAMESPACE }}/${{ env.NAME }}:linux/arm/v7
