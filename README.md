@@ -12,7 +12,7 @@ This approach enhances reliability, simplifies version control, and allows users
 
 ## Quick Start
 
-If you can’t wait to run OwnTone, here is a quick start procedure. It implies that you already have a running [Docker](https://www.docker.com) or [Podman](https://podman.io) installation.
+If you can’t wait to run OwnTone, here is a quick start procedure. It implies that you already have a running [Podman](https://podman.io) (or [Docker](https://www.docker.com)) installation.
 
 1. Create a minimal structure, assuming everything is in the home directory
 
@@ -23,7 +23,7 @@ If you can’t wait to run OwnTone, here is a quick start procedure. It implies 
 2. Launch the container
 
     ```shell
-    docker run -d \
+    podman run -d \
       --name=OwnTone \
       --network=host \
       -e UID=$(id -u) \
@@ -90,7 +90,7 @@ It gives as well the opportunity to have multiple OwnTone instances running in t
 To create a new network, you can run the following command:
 
 ```shell
-docker network create \
+podman network create \
   --driver macvlan \
   --subnet=<subnet> \
   --gateway=<gateway> \
@@ -116,7 +116,7 @@ Thus, the range of IPs leased by the router will not overlap with the range defi
 Indeed, the new network has an IP range from `192.168.0.192` to `192.168.0.222`.
 
 ```shell
-docker network create \
+podman network create \
   --driver macvlan \
   --subnet=192.168.0.0/24 \
   --gateway=192.168.0.1 \
@@ -135,12 +135,12 @@ There are multiple ways to start the OwnTone container.
 
 ### Run Command
 
-The most direct way to start the OwnTone container is to use the [Docker Run](https://docs.docker.com/engine/reference/commandline/run/) command.
+The most direct way to start the OwnTone container is to use the [Podman Run](https://docs.podman.io/en/latest/markdown/podman-run.1.html) (or [Docker Run](https://docs.docker.com/engine/reference/commandline/run/)) command.
 
 #### Command
 
 ```shell
-docker run -d \
+podman run -d \
   --name=<container-name> \
   --network=<network>
   -e UID=<uid> \
@@ -163,10 +163,10 @@ Where
 - `<database-location>` The path where the database is stored. Be sure to provide write access to the user running OwnTone.
 - `<tag>` The tag identifies which release has to be deployed. There are two meta tags: `latest` for latest production release and `staging` for the latest staging release (for more information, see the section [Releases](#releases))
 
-#### Example with Docker Run Command
+#### Example with Podman Run Command
 
 ```shell
-docker run -d \
+Podman run -d \
   --name=OwnTone \
   --network=host \
   -e UID=1000 \
@@ -205,10 +205,10 @@ services:
     restart: unless-stopped
 ```
 
-#### Example with Docker Compose Command
+#### Example with Podman Compose Command
 
 ```shell
-docker compose -f owntone.yaml
+podman compose -f owntone.yaml
 ```
 
 ### systemd
@@ -252,7 +252,7 @@ Nevertheless, if you want to create your very own version of the container image
 - **Azure** ./azure/workflows/container-image.yml
 - **GitHub** ./github/workflows/container-image.yml
 
-It is also possible to run the build command locally with `docker build` or `podman build`.
+It is also possible to run the build command locally with `podman build` (or `docker build`).
 
 This can become handy if you have made a fork of OwnTone and want to test some new features you have implemented.
 
@@ -276,7 +276,7 @@ The Dockerfile can take a few build arguments:
 ## Architectures
 
 Currently, this containerisation supports the amd64 (x86-64) and arm64 (aarch64) architectures.
-If you want to use a specific architecture, you have to specify the option `--platform` with `docker` or `podman`.
+If you want to use a specific architecture, you have to specify the option `--platform` with `podman` (or `docker`).
 
 ## Contribution
 
