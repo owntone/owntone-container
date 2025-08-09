@@ -166,7 +166,7 @@ Where
 #### Example with Podman Run Command
 
 ```shell
-Podman run -d \
+podman run -d \
   --name=OwnTone \
   --network=host \
   -e UID=1000 \
