@@ -1,6 +1,6 @@
-ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.22
+ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.21
 
-FROM alpine:3.22 AS build
+FROM alpine:3.21 AS build
 
 ARG DISABLE_UI_BUILD
 ARG PACKAGE_REPOSITORY_URL
@@ -63,7 +63,7 @@ RUN \
   install -D etc/owntone/owntone.conf usr/share/doc/owntone/examples/owntone.conf && \
   rm -rf var etc
 
-FROM alpine:3.22 AS runtime
+FROM alpine:3.21 AS runtime
 
 ARG PACKAGE_REPOSITORY_URL
 
