@@ -1,6 +1,6 @@
-ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.21
+ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.22
 
-FROM alpine:3.21 AS build
+FROM alpine:3.22 AS build
 
 ARG DISABLE_UI_BUILD
 ARG PACKAGE_REPOSITORY_URL
@@ -12,7 +12,6 @@ ARG REPOSITORY_VERSION
 WORKDIR /tmp/source
 
 RUN \
-  set -eux; \
   apk add -U -q --no-cache --no-progress --repository ${PACKAGE_REPOSITORY_URL} \
     alsa-lib-dev \
     autoconf \
@@ -47,7 +46,7 @@ RUN \
   if [ ${REPOSITORY_COMMIT} ]; then git checkout ${REPOSITORY_COMMIT}; \
   elif [ ${REPOSITORY_VERSION} ]; then git checkout tags/${REPOSITORY_VERSION}; fi && \
   if [ -z ${DISABLE_UI_BUILD} ]; then cd web-src; npm install; npm run build; cd ..; fi && \
-  autoreconf -i && \
+  autoreconf -fvi -I /usr/share/gettext/m4 && \
   ./configure \
     --disable-install_systemd \
     --disable-install_user \
@@ -63,7 +62,7 @@ RUN \
   install -D etc/owntone/owntone.conf usr/share/doc/owntone/examples/owntone.conf && \
   rm -rf var etc
 
-FROM alpine:3.21 AS runtime
+FROM alpine:3.22 AS runtime
 
 ARG PACKAGE_REPOSITORY_URL
 
@@ -71,7 +70,6 @@ COPY --from=build /tmp/build/ .
 COPY --chmod=755 /etc/init.d/* /etc/init.d/
 
 RUN \
-  set -eux; \
   apk add -U -q --no-cache --no-progress --repository ${PACKAGE_REPOSITORY_URL} \
     avahi \
     busybox-openrc \
