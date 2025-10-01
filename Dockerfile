@@ -12,6 +12,7 @@ ARG REPOSITORY_VERSION
 WORKDIR /tmp/source
 
 RUN \
+  set -eux; \
   apk add -U -q --no-cache --no-progress --repository ${PACKAGE_REPOSITORY_URL} \
     alsa-lib-dev \
     autoconf \
@@ -70,6 +71,7 @@ COPY --from=build /tmp/build/ .
 COPY --chmod=755 /etc/init.d/* /etc/init.d/
 
 RUN \
+  set -eux; \
   apk add -U -q --no-cache --no-progress --repository ${PACKAGE_REPOSITORY_URL} \
     avahi \
     busybox-openrc \
