@@ -1,6 +1,6 @@
 ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.22
 
-FROM alpine:3.22 AS build
+FROM alpine:3.23 AS build
 
 ARG DISABLE_UI_BUILD
 ARG PACKAGE_REPOSITORY_URL
