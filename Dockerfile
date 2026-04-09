@@ -1,7 +1,9 @@
-ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v3.23
+ARG ALPINE_VERSION=3.23
+ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}
 
-FROM alpine:3.23 AS build
+FROM alpine:${ALPINE_VERSION} AS build
 
+ARG ALPINE_VERSION
 ARG DISABLE_UI_BUILD
 ARG PACKAGE_REPOSITORY_URL
 ARG REPOSITORY_URL=https://github.com/owntone/owntone-server.git
@@ -62,8 +64,9 @@ RUN \
   install -D etc/owntone/owntone.conf usr/share/doc/owntone/examples/owntone.conf && \
   rm -rf var etc
 
-FROM alpine:3.23 AS runtime
+FROM alpine:${ALPINE_VERSION} AS runtime
 
+ARG ALPINE_VERSION
 ARG PACKAGE_REPOSITORY_URL
 
 COPY --from=build /tmp/build/ .
