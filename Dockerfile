@@ -62,7 +62,7 @@ RUN \
   install -D etc/owntone/owntone.conf usr/share/doc/owntone/examples/owntone.conf && \
   rm -rf var etc
 
-FROM alpine:3.22 AS runtime
+FROM alpine:3.23 AS runtime
 
 ARG PACKAGE_REPOSITORY_URL
 
