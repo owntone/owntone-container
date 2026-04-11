@@ -1,11 +1,9 @@
 ARG ALPINE_VERSION=3.23
-ARG PACKAGE_REPOSITORY_URL=https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}
 
 FROM alpine:${ALPINE_VERSION} AS build
 
 ARG ALPINE_VERSION
 ARG DISABLE_UI_BUILD
-ARG PACKAGE_REPOSITORY_URL
 ARG REPOSITORY_URL=https://github.com/owntone/owntone-server.git
 ARG REPOSITORY_BRANCH=master
 ARG REPOSITORY_COMMIT
@@ -14,7 +12,7 @@ ARG REPOSITORY_VERSION
 WORKDIR /tmp/source
 
 RUN \
-  apk add -U -q --no-cache --no-progress --repository ${PACKAGE_REPOSITORY_URL} \
+  apk add -U -q --no-cache --no-progress \
     alsa-lib-dev \
     autoconf \
     automake \
@@ -67,13 +65,12 @@ RUN \
 FROM alpine:${ALPINE_VERSION} AS runtime
 
 ARG ALPINE_VERSION
-ARG PACKAGE_REPOSITORY_URL
 
 COPY --from=build /tmp/build/ .
 COPY --chmod=755 /etc/init.d/* /etc/init.d/
 
 RUN \
-  apk add -U -q --no-cache --no-progress --repository ${PACKAGE_REPOSITORY_URL} \
+  apk add -U -q --no-cache --no-progress \
     avahi \
     busybox-openrc \
     confuse \
