@@ -40,10 +40,10 @@ jobs:
           git clone -q -b $REPOSITORY_BRANCH $REPOSITORY_URL source
           cd source
           commit=$(git log --branches -1 --pretty=format:"%h")
-          [[ $(curl -LI ${registry}/${commit} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && commit=${{ github.event.inputs.commit }}
+          [[ $(curl -LI ${registry}/${commit} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && commit=${{ inputs.commit }}
           echo "commit=${commit}" >> $GITHUB_OUTPUT
           version=$(git describe --tags $(git rev-list --tags --max-count=1))
-          [[ $(curl -LI ${registry}/${version} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && version=${{ github.event.inputs.version }}
+          [[ $(curl -LI ${registry}/${version} -o /dev/null -w '%{http_code}\n' -s) = "200" ]] && version=${{ inputs.version }}
           echo "version=${version}" >> $GITHUB_OUTPUT
 
   staging:
@@ -58,7 +58,7 @@ jobs:
         run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
           tags=${prefix}${{ needs.preparation.outputs.commit }}
-          [[ -z "${{ github.event.inputs.commit }}" || "${{ github.event.inputs.staging }}" == "true" ]] && tags+=",${prefix}staging"
+          [[ -z "${{ inputs.commit }}" || "${{ inputs.staging }}" == "true" ]] && tags+=",${prefix}staging"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -95,7 +95,7 @@ jobs:
         run: |
           prefix=${{ env.NAMESPACE }}/${{ env.NAME }}:
           tags=${prefix}${{ needs.preparation.outputs.version }}
-          [[ -z "${{ github.event.inputs.version }}" || "${{ github.event.inputs.latest }}" == "true" ]] && tags+=",${prefix}latest"
+          [[ -z "${{ inputs.version }}" || "${{ inputs.latest }}" == "true" ]] && tags+=",${prefix}latest"
           echo "tags=${tags}" >> $GITHUB_OUTPUT
       - name: Check out the repository
         uses: actions/checkout@v4
