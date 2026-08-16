@@ -4,11 +4,11 @@ The OwnTone container offers a hassle-free solution for deploying the OwnTone me
 
 This approach enhances reliability, simplifies version control, and allows users to focus on using OwnTone’s media server features rather than dealing with complicated installation processes.
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/owntone/owntone.svg)](https://hub.docker.com/r/owntone/owntone)
-[![Docker Stars](https://img.shields.io/docker/stars/owntone/owntone)](https://hub.docker.com/r/owntone/owntone)
-[![Docker Image Size (AMD64)](https://img.shields.io/docker/image-size/owntone/owntone/latest?arch=amd64&label=image%20size%20amd64)](https://hub.docker.com/r/owntone/owntone)
-[![Docker Image Size (ARM64)](https://img.shields.io/docker/image-size/owntone/owntone/latest?arch=arm64&label=image%20size%20arm64)](https://hub.docker.com/r/owntone/owntone)
-[![Docker Image Size (ARMv7)](https://img.shields.io/docker/image-size/owntone/owntone/latest?arch=arm&label=image%20size%20arm)](https://hub.docker.com/r/owntone/owntone)
+[![Image Pulls](https://img.shields.io/docker/pulls/owntone/owntone.svg)](https://hub.docker.com/r/owntone/owntone)
+[![Image Stars](https://img.shields.io/docker/stars/owntone/owntone)](https://hub.docker.com/r/owntone/owntone)
+[![Image Size (AMD64)](https://img.shields.io/docker/image-size/owntone/owntone/latest?arch=amd64&label=image%20size%20amd64)](https://hub.docker.com/r/owntone/owntone)
+[![Image Size (ARM64)](https://img.shields.io/docker/image-size/owntone/owntone/latest?arch=arm64&label=image%20size%20arm64)](https://hub.docker.com/r/owntone/owntone)
+[![Image Size (ARMv7)](https://img.shields.io/docker/image-size/owntone/owntone/latest?arch=arm&label=image%20size%20arm)](https://hub.docker.com/r/owntone/owntone)
 
 ## Quick Start
 
