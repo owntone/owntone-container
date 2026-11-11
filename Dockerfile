@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.23
+ARG ALPINE_VERSION=3.24
 
 FROM alpine:${ALPINE_VERSION} AS build
 
@@ -65,14 +65,13 @@ RUN \
 FROM alpine:${ALPINE_VERSION} AS runtime
 
 ARG ALPINE_VERSION
+ARG UID=1000 
+ENV LOG_LEVEL=1
 
 COPY --from=build /tmp/build/ .
-COPY --chmod=755 /etc/init.d/* /etc/init.d/
-
 RUN \
   apk add -U -q --no-cache --no-progress \
     avahi \
-    busybox-openrc \
     confuse \
     curl \
     dbus \
@@ -87,12 +86,12 @@ RUN \
     libuuid \
     libwebsockets \
     libxml2 \
-    openrc \
+    nss_wrapper \
     protobuf-c \
     shadow \
     sqlite \
     sqlite-libs \
-    udev-init-scripts-openrc && \
+    tini && \
   rm /etc/avahi/services/* &&\
   sed -i \
     -e 's|\(.*\)\(db_path = "\).\+\(".*\)|\t\2/var/cache/owntone/database.db\3|' \
@@ -102,17 +101,15 @@ RUN \
     -e 's|\(.*\)\(directories = { \).\+\( }.*\)|\t\2"/srv/media"\3|' \
     -e 's|\(.*\)\(trusted_networks = { \).\+\( }.*\)|\t\2"any"\3|' \
     /usr/share/doc/owntone/examples/owntone.conf && \
-  sed -i 's/^\(tty\d\:\:\)/#\1/g' /etc/inittab && \
-  sed -i \
-    -e 's/#rc_env_allow=".*"/rc_env_allow="UID GID"/g' \
-    -e 's/#rc_provide=".*"/rc_provide="loopback net"/g' \
-    -e 's/#rc_sys=".*"/rc_sys="docker"/g' \
-    /etc/rc.conf && \
-  rc-update add syslog boot && \
-  rc-update add owntone default && \
-  install -D /dev/null /run/openrc/softlevel
+    adduser -DH -u ${UID} -g owntone -h /tmp -s /sbin/nologin owntone && \
+    chmod u+s /usr/sbin/avahi-daemon /usr/sbin/avahi-dnsconfd && \
+    chmod 1777 /run
 
-ENTRYPOINT ["/sbin/init"]
+COPY --chmod=755 entrypoint.sh /usr/local/bin/
+COPY dbus-local.conf /etc/dbus-1/
+
+USER $UID
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 \
-  CMD ["/sbin/rc-service", "owntone", "status"]
+  CMD ["/usr/bin/curl", "http://localhost:3689"]
