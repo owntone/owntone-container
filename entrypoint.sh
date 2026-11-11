@@ -16,7 +16,6 @@ ensureuser() {
   fi
 }    
  
-trap cleanup TERM INT
 ensureuser $(id -u)
 mkdir -p -m 700 /run/dbus
 
@@ -34,11 +33,13 @@ PID_AVAHI=$!
 /usr/sbin/owntone -P /run/owntone.pid -d ${LOG_LEVEL}
 PID_OWNTONE=$(cat /run/owntone.pid)
 
+trap "cleanup $PID_OWNTONE $PID_AVAHI $PID_DBUS" TERM INT
+
 while kill -0 $PID_DBUS 2>/dev/null && \
       kill -0 $PID_AVAHI 2>/dev/null && \
       kill -0 $PID_OWNTONE 2>/dev/null;  do
     sleep 1
 done
 
-cleanup $PID_OWNTONE $PID_DNSCONFD $PID_AVAHI $PID_DBUS
+cleanup $PID_OWNTONE $PID_AVAHI $PID_DBUS
 exit 1
